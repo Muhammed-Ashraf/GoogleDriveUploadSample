@@ -1,5 +1,6 @@
 package ashraf.googledriveuploadsample
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -19,12 +20,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import ashraf.googledriveuploadsample.databinding.MainLayoutBinding
+import ashraf.googledriveuploadsample.ui.CapturePhotoActivity
 import ashraf.googledriveuploadsample.ui.theme.GoogleDriveUploadSampleTheme
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.SignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.OnFailureListener
+
 
 class MainActivity : ComponentActivity() {
 
@@ -33,39 +37,45 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        oneTapClient = Identity.getSignInClient(this)
+        signUpRequest = BeginSignInRequest.builder()
+            .setGoogleIdTokenRequestOptions(
+                BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
+                    .setSupported(true) // Your server's client ID, not your Android client ID.
+                    .setServerClientId(getString(R.string.web_client_id)) // Show all accounts on the device.
+                    .setFilterByAuthorizedAccounts(false)
+                    .build()
+            )
+            .build()
+        val activityResultLauncher: ActivityResultLauncher<IntentSenderRequest> =
+            registerForActivityResult(
+                ActivityResultContracts.StartIntentSenderForResult()
+            ) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    try {
+                        val credential =
+                            oneTapClient!!.getSignInCredentialFromIntent(result.data)
+                        val idToken = credential.googleIdToken
+                        if (idToken != null) {
+                            val email = credential.id
+                            Toast.makeText(
+                                applicationContext,
+                                "Email: $email",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            startActivity(
+                                Intent(
+                                    this@MainActivity,
+                                    CapturePhotoActivity::class.java
+                                )
+                            )
+                        }
+                    } catch (e: ApiException) {
+                        e.printStackTrace()
+                    }
+                }
+            }
         setContent {
-            oneTapClient = Identity.getSignInClient(this)
-            signUpRequest = BeginSignInRequest.builder()
-                .setGoogleIdTokenRequestOptions(
-                    BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
-                        .setSupported(true) // Your server's client ID, not your Android client ID.
-                        .setServerClientId(getString(R.string.web_client_id)) // Show all accounts on the device.
-                        .setFilterByAuthorizedAccounts(false)
-                        .build()
-                )
-                .build()
-//            val activityResultLauncher: ActivityResultLauncher<IntentSenderRequest> =
-//                registerForActivityResult(
-//                    ActivityResultContracts.StartIntentSenderForResult()
-//                ) { result ->
-//                    if (result.resultCode == RESULT_OK) {
-//                        try {
-//                            val credential =
-//                                oneTapClient!!.getSignInCredentialFromIntent(result.data)
-//                            val idToken = credential.googleIdToken
-//                            if (idToken != null) {
-//                                val email = credential.id
-//                                Toast.makeText(
-//                                    applicationContext,
-//                                    "Email: $email",
-//                                    Toast.LENGTH_SHORT
-//                                ).show()
-//                            }
-//                        } catch (e: ApiException) {
-//                            e.printStackTrace()
-//                        }
-//                    }
-//                }
             GoogleDriveUploadSampleTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
@@ -76,12 +86,23 @@ class MainActivity : ComponentActivity() {
                     AndroidViewBindingExample(
                         oneTapClient,
                         signUpRequest,
-                        this@MainActivity
+                        this@MainActivity,
+                        activityResultLauncher
                     )
                 }
             }
         }
 
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val account = GoogleSignIn.getLastSignedInAccount(this)
+        if (account != null) {
+            Toast.makeText(this@MainActivity, "Already Signed In", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this@MainActivity, "Please sign iN", Toast.LENGTH_SHORT).show()
+        }
     }
 }
 
@@ -115,7 +136,8 @@ fun Greeting(name: String) {
 fun AndroidViewBindingExample(
     oneTapClient: SignInClient?,
     signUpRequest: BeginSignInRequest?,
-    mainActivity: MainActivity
+    mainActivity: MainActivity,
+    activityResultLauncher: ActivityResultLauncher<IntentSenderRequest>
 ) {
     AndroidViewBinding(MainLayoutBinding::inflate) {
         mTextView.text = "How are you??"
@@ -126,9 +148,10 @@ fun AndroidViewBindingExample(
                         mainActivity
                     ) { result ->
                         Log.d("TAG", "Success")
-//                        val intentSenderRequest: IntentSenderRequest =
-//                            IntentSenderRequest.Builder(result.pendingIntent.intentSender).build()
-//                        activityResultLauncher.launch(intentSenderRequest)
+
+                        val intentSenderRequest: IntentSenderRequest =
+                            IntentSenderRequest.Builder(result.pendingIntent.intentSender).build()
+                        activityResultLauncher.launch(intentSenderRequest)
                     }
                     ?.addOnFailureListener(
                         mainActivity,
@@ -138,4 +161,6 @@ fun AndroidViewBindingExample(
             }
         }
     }
+
+
 }
