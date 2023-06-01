@@ -5,6 +5,9 @@ plugins {
     id 'com.google.dagger.hilt.android'
 }
 
+def localProperties = new Properties()
+localProperties.load(new FileInputStream(rootProject.file("local.properties")))
+
 android {
     namespace 'ashraf.googledriveuploadsample'
     compileSdk 33
@@ -28,6 +31,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
+            resValue("string", "web_client_id", localProperties['webClientId'])
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -100,6 +104,9 @@ dependencies {
         exclude module: 'guava-jdk5'
     }
 
+    // Guava
+    implementation "com.google.guava:guava:24.1-jre"
+    //Guava Fix
     implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
 
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'

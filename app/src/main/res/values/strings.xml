@@ -1,5 +1,4 @@
 <resources>
     <string name="app_name">GoogleDriveUploadSample</string>
-    <string name="web_client_id">764813691538-oo1m148u08pqh1e7t52o7d43eh5m33ue.apps.googleusercontent.com</string>
-
+    <string name="title_activity_upload">UploadActivity</string>
 </resources>
