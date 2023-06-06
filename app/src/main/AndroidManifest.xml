@@ -24,6 +24,7 @@
     </queries>
 
     <application
+        android:name=".GoogleDriveUploadApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -33,7 +34,7 @@
         android:theme="@style/Theme.GoogleDriveUploadSample"
         tools:targetApi="31">
         <activity
-            android:name=".ProductCaptureActivity"
+            android:name=".product_capture.ProductCaptureActivity"
             android:exported="true"
             android:theme="@style/AppTheme">
             <intent-filter>

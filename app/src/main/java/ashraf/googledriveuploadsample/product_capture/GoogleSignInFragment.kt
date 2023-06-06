@@ -1,4 +1,4 @@
-package ashraf.googledriveuploadsample
+package ashraf.googledriveuploadsample.product_capture
 
 import android.app.Activity
 import android.content.Intent
@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.Fragment
 import ashraf.googledriveuploadsample.databinding.FragmentGoogleSignInBinding
 import ashraf.googledriveuploadsample.util.Helpers
@@ -21,9 +22,8 @@ import ashraf.googledriveuploadsample.util.Helpers
  */
 class GoogleSignInFragment : Fragment() {
 
-
     private lateinit var binding: FragmentGoogleSignInBinding
-
+    private val viewModel: ProductCaptureViewModel by activityViewModels()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -41,6 +41,7 @@ class GoogleSignInFragment : Fragment() {
             if (result?.resultCode == Activity.RESULT_OK) {
                 // There are no request codes
                 Toast.makeText(requireActivity(), "Success", Toast.LENGTH_SHORT).show()
+                viewModel.navigateToCapturePage()
             } else {
                 Toast.makeText(
                     requireActivity(),
