@@ -1,11 +1,15 @@
 package ashraf.googledriveuploadsample.product_capture
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import ashraf.googledriveuploadsample.databinding.ActivityProductCaptureBinding
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanIntentResult
 import dagger.hilt.android.AndroidEntryPoint
+
 
 @AndroidEntryPoint
 class ProductCaptureActivity : AppCompatActivity() {

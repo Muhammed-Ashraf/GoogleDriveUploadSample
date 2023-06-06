@@ -7,6 +7,9 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import ashraf.googledriveuploadsample.databinding.FragmentProductCaptureBinding
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanIntentResult
+import com.journeyapps.barcodescanner.ScanOptions
 
 
 /**
@@ -30,7 +33,25 @@ class ProductCaptureFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Toast.makeText(requireActivity(), "Photo Capture", Toast.LENGTH_SHORT).show()
+
+        val barcodeLauncher = registerForActivityResult(
+            ScanContract()
+        ) { result: ScanIntentResult ->
+            if (result.contents == null) {
+                Toast.makeText(requireActivity(), "Cancelled", Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(
+                    requireActivity(),
+                    result.contents,
+                    Toast.LENGTH_LONG
+                ).show()
+                binding.imeiTextView.text = result.contents
+            }
+        }
+        binding.imeiDataLayout.setOnClickListener {
+            barcodeLauncher.launch(ScanOptions())
+        }
+
     }
 
     companion object {

@@ -113,4 +113,7 @@ dependencies {
     implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
 
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
+
+    //barcode scanner
+    implementation "com.journeyapps:zxing-android-embedded:4.3.0"
 }
